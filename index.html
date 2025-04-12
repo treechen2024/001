@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            touch-action: none;
+            padding-top: 20px;
+        }
+        #direction-controls {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: auto;
+            justify-content: center;
+        }
+        .direction-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #game-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .game-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .difficulty-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        #gameCanvas {
+            border: 2px solid #333;
+            background-color: #fff;
+        }
+        #score {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        #game-controls {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+        .difficulty-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #direction-controls {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: auto;
+            justify-content: center;
+        }
+        .direction-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        @media (min-width: 601px) {
+            #gameCanvas {
+                width: 80vh;
+                height: 80vh;
+            }
+        }
+        @media (max-width: 600px) {
+            #gameCanvas {
+                width: 90vw;
+                height: 90vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="direction-controls">
+            <button id="left-btn" class="direction-btn">←</button>
+            <button id="up-btn" class="direction-btn">↑</button>
+            <button id="down-btn" class="direction-btn">↓</button>
+            <button id="right-btn" class="direction-btn">→</button>
+        </div>
+        
+        <div id="game-controls">
+            <button onclick="pauseGame()" class="game-btn">暂停/继续</button>
+            <button onclick="setGameSpeed(200)" class="game-btn">简单</button>
+            <button onclick="setGameSpeed(150)" class="game-btn">中等</button>
+            <button onclick="setGameSpeed(100)" class="game-btn">困难</button>
+        </div>
+
+        <div id="score">分数: 0</div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <script src="snake.js"></script>
+</body>
+</html>
