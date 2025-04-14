@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,24 +16,29 @@
             background-color: #f5f5f5;
             font-family: Arial, sans-serif;
         }
+
         .container {
             display: flex;
             align-items: center;
         }
+
         canvas {
             background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             cursor: pointer;
         }
+
         #hexagramName {
             margin-top: 20px;
             font-size: 24px;
             font-weight: bold;
         }
+
         #yaoTextContainer {
             margin-left: 20px;
             font-size: 16px;
         }
+
         .yao-text {
             height: 50px;
             display: flex;
@@ -41,6 +47,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <canvas id="hexagramCanvas" width="300" height="400"></canvas>
@@ -125,16 +132,16 @@
         };
         const canvas = document.getElementById('hexagramCanvas');
         const ctx = canvas.getContext('2d');
-        
+
         // 初始化卦象（乾卦：六個陽爻）
         let hexagram = [1, 1, 1, 1, 1, 1]; // 1表示陽爻，0表示陰爻
-        
+
         // 繪製單個爻
         function drawLine(x, y, isYang) {
             const lineWidth = 160;
             const lineHeight = 20;
             const gap = 10;
-            
+
             ctx.fillStyle = isYang ? '#FF0000' : '#0000FF';
             if (isYang) {
                 // 陽爻：實線
@@ -145,78 +152,79 @@
                 ctx.fillRect(x + (lineWidth + gap) / 2, y, (lineWidth - gap) / 2, lineHeight);
             }
         }
-        
+
         // 繪製整個卦象
         function drawHexagram() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             const startX = 70;
             const startY = 50;
             const spacing = 50;
-            
+
             // 從上往下繪製六爻
             for (let i = 0; i < 6; i++) {
                 drawLine(startX, startY + i * spacing, hexagram[i]);
             }
         }
-        
+
         // 處理點擊事件
         canvas.addEventListener('click', (event) => {
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
-            
+
             // 計算點擊的是哪一爻
             const startY = 50;
             const spacing = 50;
             const lineHeight = 20;
             const lineWidth = 160;
             const startX = 70;
-            
+
             // 確保點擊在有效的水平範圍內
             if (x < startX || x > startX + lineWidth) {
                 return;
             }
-            
+
             // 從上到下檢查每一爻的點擊區域
-            for (let i = 5; i >= 0; i--) {
+            for (let i = 0; i < 6; i++) { // Changed loop direction
                 const lineY = startY + i * spacing;
                 const clickArea = 30; // 擴大點擊判定區域
-                
-                if (y >= lineY - clickArea/2 && y <= lineY + lineHeight + clickArea/2) {
+
+                if (y >= lineY - clickArea / 2 && y <= lineY + lineHeight + clickArea / 2) {
                     // 切換陰陽
-                    hexagram[i] = 1 - hexagram[i];
+                    hexagram[i] = 1 - hexagram[i]; // Changed index calculation
                     drawHexagram();
                     updateHexagramName();
                     break;
                 }
             }
         });
-        
+
         // 更新卦名和爻辭
         function updateHexagramName() {
             const hexagramKey = hexagram.join('');
             const name = hexagramNames[hexagramKey] || '未知卦象';
             document.getElementById('hexagramName').textContent = name;
-            
+
             // 更新爻辭
             const yaoData = yaoText[hexagramKey];
             if (yaoData) {
                 for (let i = 0; i < 6; i++) {
-                    const yaoElement = document.getElementById(`yao${5-i}`);
+                    const yaoElement = document.getElementById(`yao${5 - i}`); // Changed index
                     yaoElement.textContent = yaoData.yaoCi[i] || '';
                 }
             } else {
                 // 如果沒有對應的爻辭數據，清空顯示
                 for (let i = 0; i < 6; i++) {
-                    document.getElementById(`yao${5-i}`).textContent = '';
+                    document.getElementById(`yao${i}`).textContent = '';
                 }
             }
         }
-        
+
         // 初始繪製
         drawHexagram();
         updateHexagramName();
     </script>
 </body>
+
 </html>
