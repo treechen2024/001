@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>易經六十四卦</title>
   <style>
-    /* 全域樣式 */
     body {
       display: flex;
       flex-direction: column;
@@ -16,59 +15,75 @@
       background-color: #f5f5f5;
       font-family: Arial, sans-serif;
     }
+
     .container {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      padding: 20px;
     }
+
     canvas {
+      width: 600px;
+      height: 800px;
       background-color: white;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       cursor: pointer;
     }
+
     #hexagramName {
       margin-top: 20px;
-      font-size: 24px;
+      font-size: 32px;
       font-weight: bold;
     }
-    /* 爻辭容器設定最大高度並啟用捲動條 */
+
     #yaoTextContainer {
-      margin-left: 20px;
-      font-size: 16px;
-      max-height: 300px;       /* 設定最大高度 */
-      overflow-y: auto;        /* 超出部分顯示垂直滾動條 */
+      margin-left: 40px;
+      font-size: 20px;
+      max-height: 600px;
+      width: 300px;
+      overflow-y: auto;
     }
+
     .yao-text {
-      height: 50px;
-      display: flex;
-      align-items: center;
-      margin-bottom: 0;
+      margin-bottom: 12px;
+      line-height: 1.6;
     }
-    /* 小螢幕版面調整 */
-    @media (max-width: 480px) {
+
+    @media (max-width: 768px) {
       .container {
         flex-direction: column;
         align-items: center;
       }
+
       #yaoTextContainer {
         margin-left: 0;
         margin-top: 20px;
         width: 90%;
+        max-height: 400px;
       }
+
       canvas {
         width: 90%;
         height: auto;
       }
+
+      #hexagramName {
+        font-size: 24px;
+      }
+
+      #yaoTextContainer {
+        font-size: 16px;
+      }
+
       .yao-text {
-        font-size: 14px;
-        height: auto;
-        padding: 5px 0;
+        margin-bottom: 8px;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <canvas id="hexagramCanvas" width="300" height="400"></canvas>
+    <canvas id="hexagramCanvas" width="600" height="800"></canvas>
     <div id="yaoTextContainer">
       <div class="yao-text" id="yao5"></div>
       <div class="yao-text" id="yao4"></div>
@@ -81,11 +96,40 @@
   <div id="hexagramName"></div>
 
   <script>
-    // 定義卦辭資料，例如這裡只使用乾卦作為示範
+    // 卦辭資料（僅乾、坤為示例）
     const yaoText = {
       '111111': {
         name: '乾',
         yaoCi: [
           '初九，潛龍勿用。',
           '九二，見龍在田，利見大人。',
-          '九三，君子
+          '九三，君子終日乾乾，夕惕若厲，無咎。',
+          '九四，或躍在淵，無咎。',
+          '九五，飛龍在天，利見大人。',
+          '上九，亢龍有悔。'
+        ]
+      },
+      '000000': {
+        name: '坤',
+        yaoCi: [
+          '初六，履霜，堅冰至。',
+          '六二，直方大，不習無不利。',
+          '六三，含章可貞，或從王事，無成有終。',
+          '六四，括囊，無咎無譽。',
+          '六五，黃裳，元吉。',
+          '上六，龍戰于野，其血玄黃。'
+        ]
+      }
+    };
+
+    // 顯示乾卦
+    const hexagram = yaoText['111111'];
+    document.getElementById('hexagramName').textContent = hexagram.name;
+    for (let i = 0; i < 6; i++) {
+      document.getElementById('yao' + (5 - i)).textContent = hexagram.yaoCi[i];
+    }
+
+    // 可在此加入 canvas 畫圖功能
+  </script>
+</body>
+</html>
