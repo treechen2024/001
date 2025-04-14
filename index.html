@@ -1,106 +1,91 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>易經六十四卦</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            display: flex;
-            align-items: center;
-        }
-
-        canvas {
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-        }
-
-        #hexagramName {
-            margin-top: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        #yaoTextContainer {
-            margin-left: 20px;
-            font-size: 16px;
-        }
-
-        .yao-text {
-            height: 50px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 0px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>易經六十四卦</title>
+  <style>
+    /* 全域樣式 */
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      align-items: center;
+    }
+    canvas {
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+    #hexagramName {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    /* 爻辭容器設定最大高度並啟用捲動條 */
+    #yaoTextContainer {
+      margin-left: 20px;
+      font-size: 16px;
+      max-height: 300px;       /* 設定最大高度 */
+      overflow-y: auto;        /* 超出部分顯示垂直滾動條 */
+    }
+    .yao-text {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+    }
+    /* 小螢幕版面調整 */
+    @media (max-width: 480px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+      #yaoTextContainer {
+        margin-left: 0;
+        margin-top: 20px;
+        width: 90%;
+      }
+      canvas {
+        width: 90%;
+        height: auto;
+      }
+      .yao-text {
+        font-size: 14px;
+        height: auto;
+        padding: 5px 0;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <canvas id="hexagramCanvas" width="300" height="400"></canvas>
-        <div id="yaoTextContainer">
-            <div class="yao-text" id="yao5"></div>
-            <div class="yao-text" id="yao4"></div>
-            <div class="yao-text" id="yao3"></div>
-            <div class="yao-text" id="yao2"></div>
-            <div class="yao-text" id="yao1"></div>
-            <div class="yao-text" id="yao0"></div>
-        </div>
+  <div class="container">
+    <canvas id="hexagramCanvas" width="300" height="400"></canvas>
+    <div id="yaoTextContainer">
+      <div class="yao-text" id="yao5"></div>
+      <div class="yao-text" id="yao4"></div>
+      <div class="yao-text" id="yao3"></div>
+      <div class="yao-text" id="yao2"></div>
+      <div class="yao-text" id="yao1"></div>
+      <div class="yao-text" id="yao0"></div>
     </div>
-    <div id="hexagramName"></div>
+  </div>
+  <div id="hexagramName"></div>
 
-    <script>
-        const yaoText = {
-            '111111': {
-                name: '乾',
-                yaoCi: [
-                    '初九，潛龍勿用。',
-                    '九二，見龍在田，利見大人。',
-                    '九三，君子終日乾乾，夕惕若厲，無咎。',
-                    '九四，或躍在淵，無咎。',
-                    '九五，飛龍在天，利見大人。',
-                    '上九，亢龍有悔。'
-                ]
-            },
-            '000000': {
-                name: '坤',
-                yaoCi: [
-                    '初六，履霜，堅冰至。',
-                    '六二，直方大，不習無不利。',
-                    '六三，含章可貞，或從王事，無成有終。',
-                    '六四，括囊，無咎無譽。',
-                    '六五，黃裳，元吉。',
-                    '上六，龍戰于野，其血玄黃。'
-                ]
-            },
-            '010001': {
-                name: '屯',
-                yaoCi: [
-                    '初九，磐桓；利居貞，利建侯。',
-                    '六二，屯如邅如，乘馬班如。匪寇婚媾，女子貞不字，十年乃字。',
-                    '六三，即鹿無虞，惟入于林中；君子幾不如舍，往吝。',
-                    '六四，乘馬班如，求婚媾，往吉，無不利。',
-                    '九五，屯其膏，小貞吉，大貞凶。',
-                    '上六，乘馬班如，泣血漣如。'
-                ]
-            },
-            '100010': {
-                name: '蒙',
-                yaoCi: [
-                    '初六，發蒙，利用刑人，用說桎梏，以往吝。',
-                    '九二，包蒙吉；納婦吉；子克家。',
-                    '六三，勿用取女；見金夫，不有躬，無攸利。',
-                    '六四，困蒙，吝。',
+  <script>
+    // 定義卦辭資料，例如這裡只使用乾卦作為示範
+    const yaoText = {
+      '111111': {
+        name: '乾',
+        yaoCi: [
+          '初九，潛龍勿用。',
+          '九二，見龍在田，利見大人。',
+          '九三，君子
