@@ -160,39 +160,39 @@
             }
         }
         
-        // 處理點擊事件
+      // 處理點擊事件
         canvas.addEventListener('click', (event) => {
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
-            
+
             // 計算點擊的是哪一爻
             const startY = 50;
             const spacing = 50;
             const lineHeight = 20;
             const lineWidth = 160;
             const startX = 70;
-            
+
             // 確保點擊在有效的水平範圍內
             if (x < startX || x > startX + lineWidth) {
                 return;
             }
-            
+
             // 從上到下檢查每一爻的點擊區域
-            for (let i = 5; i >= 0; i--) {
+            for (let i = 0; i < 6; i++) { // Changed loop direction
                 const lineY = startY + i * spacing;
                 const clickArea = 30; // 擴大點擊判定區域
-                
+
                 if (y >= lineY - clickArea/2 && y <= lineY + lineHeight + clickArea/2) {
                     // 切換陰陽
-                    hexagram[5-i] = 1 - hexagram[5-i];
+                    hexagram[i] = 1 - hexagram[i]; // Changed index calculation
                     drawHexagram();
                     updateHexagramName();
                     break;
                 }
             }
-        });
-        
+        }); 
+               
         // 更新卦名和爻辭
         function updateHexagramName() {
             const hexagramKey = hexagram.join('');
