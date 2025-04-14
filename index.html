@@ -104,38 +104,3 @@
                     '九二，包蒙吉；納婦吉；子克家。',
                     '六三，勿用取女；見金夫，不有躬，無攸利。',
                     '六四，困蒙，吝。',
-                    '六五，童蒙，吉。',
-                    '上九，擊蒙；不利為寇，利禦寇。'
-                ]
-            }
-            // ⚠️ 可依需要繼續補齊其餘卦象
-        };
-
-        const hexagramNames = {
-            '111111': '天  乾',
-            '000000': '地  坤',
-            '010001': '水雷  屯',
-            '100010': '山水  蒙'
-            // ⚠️ 可依需要補齊其餘六十四卦
-        };
-
-        const canvas = document.getElementById('hexagramCanvas');
-        const ctx = canvas.getContext('2d');
-
-        let hexagram = [1, 1, 1, 1, 1, 1]; // 陽爻預設
-
-        function drawLine(x, y, isYang) {
-            const lineWidth = 160;
-            const lineHeight = 20;
-            const gap = 10;
-            ctx.fillStyle = isYang ? '#FF0000' : '#0000FF';
-            if (isYang) {
-                ctx.fillRect(x, y, lineWidth, lineHeight);
-            } else {
-                ctx.fillRect(x, y, (lineWidth - gap) / 2, lineHeight);
-                ctx.fillRect(x + (lineWidth + gap) / 2, y, (lineWidth - gap) / 2, lineHeight);
-            }
-        }
-
-        function drawHexagram() {
-            ctx.clearRect(0, 0, canvas.width,
