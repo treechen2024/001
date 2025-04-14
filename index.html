@@ -1,134 +1,212 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>貪吃蛇遊戲</title>
+    <title>易經六十四卦</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
         body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: flex-start;
             min-height: 100vh;
-            touch-action: none;
-            padding-top: 20px;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
         }
-
-        #game-container {
+        .container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
         }
-
-        #canvas-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform: scale(0.95);
-            transform-origin: center center;
-            margin-bottom: 20px;
-        }
-
-        #gameCanvas {
-            border: 2px solid #333;
-            background-color: #fff;
-        }
-
-        #score {
-            font-size: 24px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        #direction-controls {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .direction-btn {
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        canvas {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             cursor: pointer;
         }
-
-        #game-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
+        #hexagramName {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
         }
-
-        .game-btn {
-            padding: 10px 20px;
+        #yaoTextContainer {
+            margin-left: 20px;
             font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
-
-        .game-btn:hover,
-        .direction-btn:hover {
-            background-color: #45a049;
-        }
-
-        @media (min-width: 601px) {
-            #gameCanvas {
-                width: 80vh;
-                height: 80vh;
-            }
-        }
-
-        @media (max-width: 600px) {
-            #gameCanvas {
-                width: 90vw;
-                height: 90vw;
-            }
+        .yao-text {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0px;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="canvas-container">
-            <canvas id="gameCanvas" width="400" height="400"></canvas>
-        </div>
-
-        <div id="score">分數: 0　最高分: 0　時間: 0s</div>
-
-        <div id="direction-controls">
-            <button id="left-btn" class="direction-btn">←</button>
-            <button id="up-btn" class="direction-btn">↑</button>
-            <button id="down-btn" class="direction-btn">↓</button>
-            <button id="right-btn" class="direction-btn">→</button>
-        </div>
-
-        <div id="game-controls">
-            <button onclick="pauseGame()" class="game-btn">||</button>
-            <button onclick="setGameSpeed(250)" class="game-btn">簡單</button>
-            <button onclick="setGameSpeed(150)" class="game-btn">中等</button>
-            <button onclick="setGameSpeed(100)" class="game-btn">困難</button>
+    <div class="container">
+        <canvas id="hexagramCanvas" width="300" height="400"></canvas>
+        <div id="yaoTextContainer">
+            <div class="yao-text" id="yao5"></div>
+            <div class="yao-text" id="yao4"></div>
+            <div class="yao-text" id="yao3"></div>
+            <div class="yao-text" id="yao2"></div>
+            <div class="yao-text" id="yao1"></div>
+            <div class="yao-text" id="yao0"></div>
         </div>
     </div>
-
-    <script src="snake.js"></script>
+    <div id="hexagramName"></div>
+    <script src="yijing_data.js"></script>
+    <script>
+        // 六十四卦名稱
+        const hexagramNames = {
+            '111111': '天  乾',
+            '000000': '地  坤',
+            '010001': '雷地  屯',
+            '100010': '山水  蒙',
+            '010111': '水天  需',
+            '111010': '天水  訟',
+            '000010': '地水  師',
+            '010000': '水地  比',
+            '110111': '風天  小畜',
+            '111011': '天澤  履',
+            '000111': '地天  泰',
+            '111000': '天地  否',
+            '111101': '天火  同人',
+            '101111': '火天  大有',
+            '000100': '地山  謙',
+            '001000': '雷地  豫',
+            '011001': '澤雷  隨',
+            '100110': '山風  蠱',
+            '000011': '地澤  臨',
+            '110000': '風地  觀',
+            '101001': '火雷  噬嗑',
+            '100101': '山火  賁',
+            '100000': '山地  剝',
+            '000001': '地雷  復',
+            '111001': '天雷  無妄',
+            '100111': '山天  大畜',
+            '100001': '山雷 頤',
+            '011110': '澤風  大過',
+            '010010': '水  坎',
+            '101101': '火  離',
+            '011100': '澤山  咸',
+            '001110': '雷風  恆',
+            '111100': '天山  遯',
+            '001111': '雷天  大壯',
+            '101000': '火地  晉',
+            '000101': '地火  明夷',
+            '101011': '火澤  家人',
+            '110101': '火山  睽',
+            '001010': '水山  蹇為',
+            '010100': '雷水  解',
+            '100011': '山澤  損',
+            '110001': '風雷  益',
+            '011111': '澤天  夬',
+            '111110': '天風  姤',
+            '000110': '地澤  萃',
+            '011000': '地風  升',
+            '011010': '水澤  困',
+            '010110': '水風  井',
+            '011101': '澤火  革',
+            '101110': '火風  鼎',
+            '001001': '雷  震',
+            '100100': '山  艮',
+            '110100': '風山  漸',
+            '001011': '雷澤  歸妹',
+            '001101': '雷火  豐',
+            '101100': '火山  旅',
+            '110110': '風  巽',
+            '011011': '澤  兌',
+            '110010': '風水  渙',
+            '010011': '水澤  節',
+            '110011': '風澤  中孚',
+            '001100': '雷山  小過',
+            '010101': '水火  既濟',
+            '101010': '火水  未濟'
+        };
+        const canvas = document.getElementById('hexagramCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 初始化卦象（乾卦：六個陽爻）
+        let hexagram = [1, 1, 1, 1, 1, 1]; // 1表示陽爻，0表示陰爻
+        
+        // 繪製單個爻
+        function drawLine(x, y, isYang) {
+            const lineWidth = 160;
+            const lineHeight = 20;
+            const gap = 10;
+            
+            ctx.fillStyle = isYang ? '#FF0000' : '#0000FF';
+            if (isYang) {
+                // 陽爻：實線
+                ctx.fillRect(x, y, lineWidth, lineHeight);
+            } else {
+                // 陰爻：虛線（兩段）
+                ctx.fillRect(x, y, (lineWidth - gap) / 2, lineHeight);
+                ctx.fillRect(x + (lineWidth + gap) / 2, y, (lineWidth - gap) / 2, lineHeight);
+            }
+        }
+        
+        // 繪製整個卦象
+        function drawHexagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const startX = 70;
+            const startY = 50;
+            const spacing = 50;
+            
+            // 從上往下繪製六爻
+            for (let i = 0; i < 6; i++) {
+                drawLine(startX, startY + i * spacing, hexagram[i]);
+            }
+        }
+        
+        // 處理點擊事件
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // 計算點擊的是哪一爻
+            const startY = 50;
+            const spacing = 50;
+            const lineHeight = 20;
+            
+            for (let i = 0; i < 6; i++) {
+                const lineY = startY + (5 - i) * spacing;
+                if (y >= lineY && y <= lineY + lineHeight && x >= 70 && x <= 230) {
+                    // 切換陰陽
+                    hexagram[i] = 1 - hexagram[i];
+                    drawHexagram();
+                    updateHexagramName();
+                    break;
+                }
+            }
+        });
+        
+        // 更新卦名和爻辭
+        function updateHexagramName() {
+            const hexagramKey = hexagram.join('');
+            const name = hexagramNames[hexagramKey] || '未知卦象';
+            document.getElementById('hexagramName').textContent = name;
+            
+            // 更新爻辭
+            const yaoData = yaoText[hexagramKey];
+            if (yaoData) {
+                for (let i = 0; i < 6; i++) {
+                    const yaoElement = document.getElementById(`yao${i}`);
+                    yaoElement.textContent = yaoData.yaoCi[i] || '';
+                }
+            } else {
+                // 如果沒有對應的爻辭數據，清空顯示
+                for (let i = 0; i < 6; i++) {
+                    document.getElementById(`yao${i}`).textContent = '';
+                }
+            }
+        }
+        
+        // 初始繪製
+        drawHexagram();
+        updateHexagramName();
+    </script>
 </body>
 </html>
