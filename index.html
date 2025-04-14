@@ -170,12 +170,22 @@
             const startY = 50;
             const spacing = 50;
             const lineHeight = 20;
+            const lineWidth = 160;
+            const startX = 70;
             
-            for (let i = 0; i < 6; i++) {
-                const lineY = startY + (5 - i) * spacing;
-                if (y >= lineY && y <= lineY + lineHeight && x >= 70 && x <= 230) {
+            // 確保點擊在有效的水平範圍內
+            if (x < startX || x > startX + lineWidth) {
+                return;
+            }
+            
+            // 從上到下檢查每一爻的點擊區域
+            for (let i = 5; i >= 0; i--) {
+                const lineY = startY + i * spacing;
+                const clickArea = 30; // 擴大點擊判定區域
+                
+                if (y >= lineY - clickArea/2 && y <= lineY + lineHeight + clickArea/2) {
                     // 切換陰陽
-                    hexagram[i] = 1 - hexagram[i];
+                    hexagram[5-i] = 1 - hexagram[5-i];
                     drawHexagram();
                     updateHexagramName();
                     break;
