@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易經六十四卦</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+        }
+        canvas {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        #hexagramName {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #yaoTextContainer {
+            margin-left: 20px;
+            font-size: 16px;
+        }
+        .yao-text {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="hexagramCanvas" width="300" height="400"></canvas>
+        <div id="yaoTextContainer">
+            <div class="yao-text" id="yao5"></div>
+            <div class="yao-text" id="yao4"></div>
+            <div class="yao-text" id="yao3"></div>
+            <div class="yao-text" id="yao2"></div>
+            <div class="yao-text" id="yao1"></div>
+            <div class="yao-text" id="yao0"></div>
+        </div>
+    </div>
+    <div id="hexagramName"></div>
+    <script src="yijing_data.js"></script>
+    <script>
+        // 六十四卦名稱
+        const hexagramNames = {
+            '111111': '天  乾',
+            '000000': '地  坤',
+            '010001': '雷地  屯',
+            '100010': '山水  蒙',
+            '010111': '水天  需',
+            '111010': '天水  訟',
+            '000010': '地水  師',
+            '010000': '水地  比',
+            '110111': '風天  小畜',
+            '111011': '天澤  履',
+            '000111': '地天  泰',
+            '111000': '天地  否',
+            '111101': '天火  同人',
+            '101111': '火天  大有',
+            '000100': '地山  謙',
+            '001000': '雷地  豫',
+            '011001': '澤雷  隨',
+            '100110': '山風  蠱',
+            '000011': '地澤  臨',
+            '110000': '風地  觀',
+            '101001': '火雷  噬嗑',
+            '100101': '山火  賁',
+            '100000': '山地  剝',
+            '000001': '地雷  復',
+            '111001': '天雷  無妄',
+            '100111': '山天  大畜',
+            '100001': '山雷 頤',
+            '011110': '澤風  大過',
+            '010010': '水  坎',
+            '101101': '火  離',
+            '011100': '澤山  咸',
+            '001110': '雷風  恆',
+            '111100': '天山  遯',
+            '001111': '雷天  大壯',
+            '101000': '火地  晉',
+            '000101': '地火  明夷',
+            '101011': '火澤  家人',
+            '110101': '火山  睽',
+            '001010': '水山  蹇為',
+            '010100': '雷水  解',
+            '100011': '山澤  損',
+            '110001': '風雷  益',
+            '011111': '澤天  夬',
+            '111110': '天風  姤',
+            '000110': '地澤  萃',
+            '011000': '地風  升',
+            '011010': '水澤  困',
+            '010110': '水風  井',
+            '011101': '澤火  革',
+            '101110': '火風  鼎',
+            '001001': '雷  震',
+            '100100': '山  艮',
+            '110100': '風山  漸',
+            '001011': '雷澤  歸妹',
+            '001101': '雷火  豐',
+            '101100': '火山  旅',
+            '110110': '風  巽',
+            '011011': '澤  兌',
+            '110010': '風水  渙',
+            '010011': '水澤  節',
+            '110011': '風澤  中孚',
+            '001100': '雷山  小過',
+            '010101': '水火  既濟',
+            '101010': '火水  未濟'
+        };
+        const canvas = document.getElementById('hexagramCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 初始化卦象（乾卦：六個陽爻）
+        let hexagram = [1, 1, 1, 1, 1, 1]; // 1表示陽爻，0表示陰爻
+        
+        // 繪製單個爻
+        function drawLine(x, y, isYang) {
+            const lineWidth = 160;
+            const lineHeight = 20;
+            const gap = 10;
+            
+            ctx.fillStyle = isYang ? '#FF0000' : '#0000FF';
+            if (isYang) {
+                // 陽爻：實線
+                ctx.fillRect(x, y, lineWidth, lineHeight);
+            } else {
+                // 陰爻：虛線（兩段）
+                ctx.fillRect(x, y, (lineWidth - gap) / 2, lineHeight);
+                ctx.fillRect(x + (lineWidth + gap) / 2, y, (lineWidth - gap) / 2, lineHeight);
+            }
+        }
+        
+        // 繪製整個卦象
+        function drawHexagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const startX = 70;
+            const startY = 50;
+            const spacing = 50;
+            
+            // 從上往下繪製六爻
+            for (let i = 0; i < 6; i++) {
+                drawLine(startX, startY + i * spacing, hexagram[i]);
+            }
+        }
+        
+        // 處理點擊事件
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // 計算點擊的是哪一爻
+            const startY = 50;
+            const spacing = 50;
+            const lineHeight = 20;
+            const lineWidth = 160;
+            const startX = 70;
+            
+            // 確保點擊在有效的水平範圍內
+            if (x < startX || x > startX + lineWidth) {
+                return;
+            }
+            
+            // 從上到下檢查每一爻的點擊區域
+            for (let i = 5; i >= 0; i--) {
+                const lineY = startY + i * spacing;
+                const clickArea = 30; // 擴大點擊判定區域
+                
+                if (y >= lineY - clickArea/2 && y <= lineY + lineHeight + clickArea/2) {
+                    // 切換陰陽
+                    hexagram[i] = 1 - hexagram[i];
+                    drawHexagram();
+                    updateHexagramName();
+                    break;
+                }
+            }
+        });
+        
+        // 更新卦名和爻辭
+        function updateHexagramName() {
+            const hexagramKey = hexagram.join('');
+            const name = hexagramNames[hexagramKey] || '未知卦象';
+            document.getElementById('hexagramName').textContent = name;
+            
+            // 更新爻辭
+            const yaoData = yaoText[hexagramKey];
+            if (yaoData) {
+                for (let i = 0; i < 6; i++) {
+                    const yaoElement = document.getElementById(`yao${5-i}`);
+                    yaoElement.textContent = yaoData.yaoCi[i] || '';
+                }
+            } else {
+                // 如果沒有對應的爻辭數據，清空顯示
+                for (let i = 0; i < 6; i++) {
+                    document.getElementById(`yao${5-i}`).textContent = '';
+                }
+            }
+        }
+        
+        // 初始繪製
+        drawHexagram();
+        updateHexagramName();
+    </script>
+</body>
+</html>
