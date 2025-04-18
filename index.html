@@ -259,14 +259,17 @@
         // 初始化卦象（乾卦：六個陽爻）
         let hexagram = [1, 1, 1, 1, 1, 1]; // 1表示陽爻，0表示陰爻
         
-        // 初始化下拉選單
-        const selectElement = document.getElementById('hexagramSelect');
-        Object.entries(hexagramNames).forEach(([key, value]) => {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = value;
-            selectElement.appendChild(option);
-        });
+        // 初始化下拉選單（依卦名文字遞增排序）
+const selectElement = document.getElementById('hexagramSelect');
+Object.entries(hexagramNames)
+    .sort((a, b) => a[1].localeCompare(b[1], 'zh-Hant')) // 按卦名繁體中文排序
+    .forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = value;
+        selectElement.appendChild(option);
+    });
+
 
         // 監聽下拉選單變化
         selectElement.addEventListener('change', (event) => {
