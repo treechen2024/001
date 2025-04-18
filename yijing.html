@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易經六十四卦</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+        .container {
+            display: flex;
+            align-items: flex-start;
+            max-width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        canvas {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            max-width: 100%;
+            height: auto;
+        }
+        #hexagramName {
+            margin-top: 20px; /* 與上方內容的距離 */
+            margin-bottom: 25px; /* 與按鍵的距離 */
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+            line-height: 1.5; /* 增加行距，確保兩行顯示更清晰 */
+            white-space: pre-line; /* 確保換行符被解析 */
+        }
+        #yaoTextContainer {
+            font-size: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 300px;
+        }
+        .yao-text {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            line-height: 1.4;
+        }
+        .yao-text:last-child {
+            border-bottom: none;
+        }
+        #buttonContainer {
+            display: flex;
+            gap: 10px;
+            margin-top: 0; /* 確保按鍵與卦名的距離由 #hexagramName 控制 */
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            #yaoTextContainer {
+                margin-top: 20px;
+                margin-left: 0;
+                max-height: 300px;
+                width: calc(100% - 20px);
+            }
+            canvas {
+                width: 100%;
+                max-width: 300px;
+            }
+            #hexagramName {
+                font-size: 20px;
+            }
+            .yao-text {
+                font-size: 14px;
+            }
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+            #hexagramSelect {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        #hexagramSelect {
+            padding: 8px;
+            font-size: 16px;
+            width: 200px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+        }
+        .yao-container {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .yao-text {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .yao-text:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .yao-modern {
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+            display: none;
+        }
+        
+        .yao-modern.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="hexagramCanvas" width="300" height="400"></canvas>
+        <div id="yaoTextContainer">
+            <div class="yao-container">
+                <div class="yao-text" id="yao0"></div>
+                <div class="yao-modern hidden" id="yao0-modern"></div>
+            </div>
+            <div class="yao-container">
+                <div class="yao-text" id="yao1"></div>
+                <div class="yao-modern hidden" id="yao1-modern"></div>
+            </div>
+            <div class="yao-container">
+                <div class="yao-text" id="yao2"></div>
+                <div class="yao-modern hidden" id="yao2-modern"></div>
+            </div>
+            <div class="yao-container">
+                <div class="yao-text" id="yao3"></div>
+                <div class="yao-modern hidden" id="yao3-modern"></div>
+            </div>
+            <div class="yao-container">
+                <div class="yao-text" id="yao4"></div>
+                <div class="yao-modern hidden" id="yao4-modern"></div>
+            </div>
+            <div class="yao-container">
+                <div class="yao-text" id="yao5"></div>
+                <div class="yao-modern hidden" id="yao5-modern"></div>
+            </div>
+        </div>
+    </div>
+    <div id="hexagramName"></div>
+    <div id="buttonContainer">
+        <button id="reverseBtn" style="background-color: black; color: white;">錯卦</button>
+        <button id="zongBtn" style="background-color: red; color: white;">綜卦</button>
+        <select id="hexagramSelect"></select>
+    </div>
+    <script src="yijing_data.js"></script>
+    <script>
+        // 六十四卦名稱
+        const hexagramNames = {
+            '000000': '02.坤為地\n坤，元亨，利牝馬之貞。君子有攸往。先迷後得，主利，西南得朋，東北喪朋，安貞吉',
+            '000001': '24.地雷復\n復，亨，出入无疾，朋來无咎，反復其道，七日來復，利有攸往',
+            '000010': '07.地水師\n師貞，丈人吉，无咎',
+            '000011': '19.地澤臨\n臨，元亨利貞，至于八月有凶',
+            '000100': '15.地山謙\n謙，亨，君子有終',
+            '000101': '36.地火明夷\n明夷，利艱貞',
+            '000110': '46.地風升\n升，元亨，用見大人，勿恤，南征吉',
+            '000111': '11.地天泰\n泰，小往大來，吉亨',
+            '001000': '16.雷地豫\n豫，利建侯、行師',
+            '001001': '51.震為雷\n震亨，震來虩虩，笑言啞啞，震驚百里，不喪匕鬯',
+            '001010': '40.雷水解\n解，利西南，无所往，其來復吉。有攸往，夙吉',
+            '001011': '54.雷澤歸妹\n歸妹，征凶，无攸利',
+            '001100': '62.雷山小過\n小過，亨，利貞，可小事，不可大事。飛鳥遺之音，不宜上，宜下，大吉',
+            '001101': '55.雷火豐\n豐亨，王假之，勿憂，宜日中',
+            '001110': '32.雷風恆\n恒亨，无咎，利貞，利有攸往',
+            '001111': '34.雷天大壯\n大壯，利貞',
+            '010000': '08.水地比\n比，吉，原筮元永貞，无咎，不寧方來，後夫凶',
+            '010001': '03.水雷屯\n屯，元亨利貞，勿用有攸往，利建侯',
+            '010010': '29.坎為水\n習坎，有孚，維心亨，行有尚',
+            '010011': '60.水澤節\n節，亨。苦節，不可貞',
+            '010100': '39.水山蹇\n蹇，利西南，不利東北，利見大人，貞吉',
+            '010101': '63.水火既濟\n既濟，亨小，利貞，初吉終亂',
+            '010110': '48.水風井\n井，改邑不改井，无喪无得，往來井，井汔至，亦未繘井，羸其瓶，凶',
+            '010111': '05.水天需\n需，有孚，光亨，貞吉，利涉大川',
+            '011000': '45.澤地萃\n萃，亨，王假有廟。利見大人，亨，利貞，用大牲吉，利有攸往',
+            '011001': '17.澤雷隨\n隨，元亨利貞，无咎',
+            '011010': '47.澤水困\n困，亨，貞，大人吉，无咎，有言不信',
+            '011011': '58.兌為澤\n兌，亨，利貞',
+            '011100': '31.澤山咸\n咸亨，利貞，取女吉',
+            '011101': '49.澤火革\n革，已日乃孚，元亨利貞，悔亡',
+            '011110': '28.澤風大過\n大過，棟橈。利有攸往，亨',
+            '011111': '43.澤天夬\n夬，揚于王庭，孚號有厲；告自邑，不利即戎，利有攸往',
+            '100000': '23.山地剝\n剝，不利有攸往',
+            '100001': '27.山雷頤\n頤，貞吉，觀頤，自求口實',
+            '100010': '04.山水蒙\n蒙，亨，匪我求童蒙，童蒙求我。初筮告，再三瀆，瀆則不告，利貞',
+            '100011': '41.山澤損\n損，有孚，元吉，无咎可貞，利有攸往，曷之用，二簋可用享',
+            '100100': '52.艮為山\n艮其背，不獲其身；行其庭，不見其人。无咎',
+            '100101': '22.山火賁\n賁，亨小，利有攸往',
+            '100110': '18.山風蠱\n蠱，元亨，利涉大川。先甲三日，後甲三日',
+            '100111': '26.山天大畜\n大畜，利貞，不家食，吉，利涉大川',
+            '101000': '35.火地晉\n晉，康候用錫馬蕃庶，晝日三接',
+            '101001': '21.火雷噬嗑\n噬嗑亨，利用獄',
+            '101010': '64.火水未濟\n未濟，亨。小狐汔濟，濡其尾，无攸利',
+            '101011': '38.火澤睽\n睽，小事吉',
+            '101100': '56.火山旅\n旅，小亨，旅貞吉',
+            '101101': '30.離為火\n離，利貞，亨，畜牝牛吉',
+            '101110': '50.火風鼎\n鼎，元吉，亨',
+            '101111': '14.火天大有\n大有，元亨',
+            '110000': '20.風地觀\n觀，盥而不薦，有孚顒若',
+            '110001': '42.風雷益\n益，利有攸往，利涉大川',
+            '110010': '59.風水渙\n渙，亨，王假有廟，利涉大川，利貞',
+            '110011': '61.風澤中孚\n中孚，豚魚吉，利涉大川，利貞',
+            '110100': '53.風山漸\n漸，女歸吉，利貞',
+            '110101': '37.風火家人\n家人，利女貞',
+            '110110': '57.巽為風\n巽，小亨，利有攸往，利見大人',
+            '110111': '09.風天小畜\n小畜，亨，密雲不雨，自我西郊',
+            '111000': '12.天地否\n否之匪人，不利君子貞，大往小來',
+            '111001': '25.天雷無妄\n无妄，元亨利貞。其匪正有眚，不利有攸往',
+            '111010': '06.天水訟\n訟，有孚，窒惕，中吉，終凶，利見大人，不利涉大川',
+            '111011': '10.天澤履\n履虎尾，不咥人，亨',
+            '111100': '33.天山遯\n遯亨，小利貞',
+            '111101': '13.天火同人\n同人于野，亨，利涉大川，利君子貞',
+            '111110': '44.天風姤\n姤，女壯，勿用取女',
+            '111111': '01.乾為天\n乾，元亨利貞'
+        };
+        const canvas = document.getElementById('hexagramCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 初始化卦象（乾卦：六個陽爻）
+        let hexagram = [1, 1, 1, 1, 1, 1]; // 1表示陽爻，0表示陰爻
+        
+// 初始化下拉選單（顯示卦名第一行並排序）
+const selectElement = document.getElementById('hexagramSelect');
+
+Object.entries(hexagramNames)
+    .sort((a, b) => {
+        const nameA = a[1].split('\n')[0]; // 只取第一行
+        const nameB = b[1].split('\n')[0];
+        return nameA.localeCompare(nameB, 'zh-Hant');
+    })
+    .forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = value.split('\n')[0]; // 僅顯示第一行
+        selectElement.appendChild(option);
+    });
+
+
+
+        // 監聽下拉選單變化
+        selectElement.addEventListener('change', (event) => {
+            const selectedKey = event.target.value;
+            hexagram = selectedKey.split('').map(Number);
+            drawHexagram();
+            updateHexagramName();
+        });
+        
+        // 繪製單個爻
+        function drawLine(x, y, isYang) {
+            const lineWidth = 160;
+            const lineHeight = 20;
+            const gap = 10;
+            
+            ctx.fillStyle = isYang ? '#FF0000' : '#0000FF';
+            if (isYang) {
+                // 陽爻：實線
+                ctx.fillRect(x, y, lineWidth, lineHeight);
+            } else {
+                // 陰爻：虛線（兩段）
+                ctx.fillRect(x, y, (lineWidth - gap) / 2, lineHeight);
+                ctx.fillRect(x + (lineWidth + gap) / 2, y, (lineWidth - gap) / 2, lineHeight);
+            }
+        }
+        
+        // 繪製整個卦象
+        function drawHexagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const startX = 70;
+            const startY = 50;
+            const spacing = 50;
+            
+            // 從上往下繪製六爻
+            for (let i = 0; i < 6; i++) {
+                drawLine(startX, startY + i * spacing, hexagram[i]);
+            }
+        }
+        
+        // 處理點擊事件
+        canvas.addEventListener('click', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // 計算點擊的是哪一爻
+            const startY = 50;
+            const spacing = 50;
+            const lineHeight = 20;
+            const lineWidth = 160;
+            const startX = 70;
+            
+            // 確保點擊在有效的水平範圍內
+            if (x < startX || x > startX + lineWidth) {
+                return;
+            }
+            
+            // 從上到下檢查每一爻的點擊區域
+            for (let i = 5; i >= 0; i--) {
+                const lineY = startY + i * spacing;
+                const clickArea = 30; // 擴大點擊判定區域
+                
+                if (y >= lineY - clickArea/2 && y <= lineY + lineHeight + clickArea/2) {
+                    // 切換陰陽
+                    hexagram[i] = 1 - hexagram[i];
+                    drawHexagram();
+                    updateHexagramName();
+                    break;
+                }
+            }
+        });
+        // 更新卦名和爻辭
+function updateHexagramName() {
+    const hexagramKey = hexagram.join('');
+    const name = hexagramNames[hexagramKey] || '未知卦象';
+    document.getElementById('hexagramName').textContent = name;
+
+    // 更新下拉選單的選中項目
+    const selectElement = document.getElementById('hexagramSelect');
+    selectElement.value = hexagramKey;
+
+    // 更新爻辭
+    const yaoData = yaoText[hexagramKey];
+    const yaoModernData = yaoTextModern[hexagramKey];
+
+    if (yaoData && yaoData.yaoCi) {
+        for (let i = 0; i < 6; i++) {
+            const yaoElement = document.getElementById(`yao${i}`);
+            const yaoModernElement = document.getElementById(`yao${i}-modern`);
+
+            if (yaoData.yaoCi[i]) {
+                yaoElement.textContent = yaoData.yaoCi[i];
+                if (yaoModernData && yaoModernData.yaoCiModern[i]) {
+                    yaoModernElement.textContent = yaoModernData.yaoCiModern[i];
+                }
+            } else {
+                yaoElement.textContent = '';
+                yaoModernElement.textContent = '';
+            }
+        }
+    }
+  }
+
+        // 添加爻辭點擊事件處理
+        for (let i = 0; i < 6; i++) {
+            const yaoElement = document.getElementById(`yao${i}`);
+            const yaoModernElement = document.getElementById(`yao${i}-modern`);
+            
+            yaoElement.addEventListener('click', () => {
+                const isShown = yaoModernElement.classList.contains('show');
+                // 隱藏所有白話爻辭
+                document.querySelectorAll('.yao-modern').forEach(el => {
+                    el.classList.remove('show');
+                });
+                // 切換當前白話爻辭的顯示狀態
+                if (!isShown) {
+                    yaoModernElement.classList.add('show');
+                }
+            });
+        }
+        
+        // 初始繪製
+        drawHexagram();
+        updateHexagramName();
+
+        // 錯卦功能
+        document.getElementById('reverseBtn').addEventListener('click', () => {
+            // 將所有爻的陰陽狀態取反
+            for (let i = 0; i < 6; i++) {
+                hexagram[i] = 1 - hexagram[i];
+            }
+            drawHexagram();
+            updateHexagramName();
+        });
+
+        // 綜卦功能
+        document.getElementById('zongBtn').addEventListener('click', () => {
+            // 將六爻順序顛倒
+            hexagram = [...hexagram].reverse();  // 修正了這裡！
+            drawHexagram();
+            updateHexagramName();
+        });
+    </script>
+</body>
+</html>
